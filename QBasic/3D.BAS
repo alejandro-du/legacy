@@ -1,0 +1,31 @@
+DECLARE SUB ALEJAR (C!, X1!, Y1!, X2!, Y2!)
+DECLARE SUB ACERCAR (C, X1, X2, Y1, Y2)
+
+C = 11
+X1 = 1
+X2 = 319
+Y1 = 1
+Y2 = 199
+
+SCREEN 13
+
+LINE (X1, Y1)-(X2, Y2), C, B
+
+DO
+
+A$ = INKEY$
+IF A$ = CHR$(27) THEN END
+IF A$ = "A" OR A$ = "a" THEN CALL ALEJAR(C, X1, Y1, X2, Y2)
+LOOP
+
+SUB ALEJAR (C, X1, Y1, X2, Y2)
+
+X1 = X1 + 3
+X2 = X2 - 3
+Y1 = Y1 + 3
+Y2 = Y2 - 3
+CLS
+LINE (X1, Y1)-(X2, Y2), C, B
+
+END SUB
+

@@ -1,0 +1,40 @@
+RESET
+FOR A = 1 TO 10
+ON KEY(A) GOSUB PAUSA
+KEY(A) ON
+NEXT A
+WIDTH 80, 50
+VIEW PRINT 1 TO 50
+CLOSE
+CLS
+2
+P = P + 1
+IF P = 101 THEN END
+CLS
+B = 0
+1 B = B + 1
+IF B = 49 THEN 2
+FOR A = 1 TO 80
+LOCATE B + 1, A: PRINT "²"
+LOCATE 1, 1: PRINT "LINEA #:"; B; "de 48"; "        "; "N§:"; A; "de 80"; "        "; "Pantalla #:"; P; "de 100 "
+A$ = INKEY$
+IF A$ = "P" OR A$ = "p" OR A$ = " " THEN GOSUB PAUSA
+IF A$ = CHR$(27) OR A$ = CHR$(13) THEN GOSUB SALIR
+X = INT(RND * 319)
+Y = INT(RND * 319)
+C = INT(RND * 256)
+CLOSE
+NEXT A
+GOTO 1
+PAUSA:
+COLOR 23
+LOCATE 1, 75: PRINT "Pausa"
+3 A$ = "": A$ = INKEY$: IF A$ = "" THEN 3
+IF A$ = CHR$(27) OR A$ = CHR$(13) THEN GOSUB SALIR
+LOCATE 1, 75: PRINT "     "
+COLOR 7
+RETURN
+SALIR:
+COLOR 7
+END
+

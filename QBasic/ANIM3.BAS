@@ -1,0 +1,23 @@
+ON KEY(1) GOSUB FIN
+KEY(1) ON
+SCREEN 8
+B = 0: C = 639: D = 199
+FOR A = 1 TO 10
+FOR F = 1 TO 1000: NEXT F
+LINE (B, B)-(C, D), 1, B
+SOUND 50, 1
+B = B + 10: C = C - 10: D = D - 10
+NEXT A
+
+
+
+
+
+
+
+
+
+
+FIN:
+END
+

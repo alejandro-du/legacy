@@ -1,0 +1,8 @@
+SCREEN 9
+FOR A = 1 TO 185 STEP 7
+COL = INT(RND * 15) + 1
+CIRCLE (A, A), A, COL, , 3
+CIRCLE (345, A), A, COL, 3
+LINE (35, A)-(A, A), COL
+NEXT A
+

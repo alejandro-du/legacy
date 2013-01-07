@@ -1,0 +1,130 @@
+DECLARE SUB DESHACE ()
+DECLARE SUB DISUELVE ()
+DECLARE SUB APAGA ()
+DECLARE SUB PONERPAL (colorn AS INTEGER, r AS INTEGER, g AS INTEGER, b AS INTEGER)
+DECLARE SUB LEEPCX ()
+
+DEFINT A-Z
+
+SCREEN 13
+
+TYPE ORUGA
+  COLORS AS INTEGER
+  VELOCIDAD AS INTEGER
+  Y AS INTEGER
+  CONTADOR AS INTEGER
+END TYPE
+
+CALL LEEPCX
+'CALL DISUELVE
+'CALL APAGA
+CALL DESHACE
+
+SUB APAGA
+  FOR N = 1 TO 64
+    FOR K = 1 TO 255
+      OUT (&H3C7), K
+      r = INP(&H3C9)
+      g = INP(&H3C9)
+      b = INP(&H3C9)
+      OUT (&H3C8), K
+      IF r >= 1 THEN r = r - 1
+      IF g >= 1 THEN g = g - 1
+      IF b >= 1 THEN b = b - 1
+      OUT (&H3C9), r
+			OUT (&H3C9), g
+			OUT (&H3C9), b
+    NEXT K
+  NEXT N
+END SUB
+
+SUB DESHACE
+  DIM ORUGAS(1 TO 320) AS ORUGA
+  FOR N = 1 TO 320
+    ORUGAS(N).COLORS = 0
+    ORUGAS(N).VELOCIDAD = 3 + RND * 9
+    ORUGAS(N).Y = 0
+    ORUGAS(N).CONTADOR = 0
+  NEXT N
+  DO
+    FOR N = 1 TO 320
+      IF ORUGAS(N).CONTADOR = ORUGAS(N).VELOCIDAD THEN
+        ORUGAS(N).CONTADOR = 0
+        PSET (N, ORUGAS(N).Y), 255
+        ORUGAS(N).Y = ORUGAS(N).Y + 1
+      ELSE
+        ORUGAS(N).CONTADOR = ORUGAS(N).CONTADOR + 1
+      END IF
+    NEXT N
+    TICKS = TICKS + 1
+  LOOP WHILE TICKS < 3000
+END SUB
+
+SUB DISUELVE
+  FOR N# = 1 TO 300000
+    PSET (RND * 320, RND * 200), 0
+  NEXT N#
+END SUB
+
+SUB LEEPCX
+  OPEN "D:\rose.PCX" FOR BINARY AS #1
+  OPEN "E:\LOAD.DAT" FOR BINARY AS #2 LEN = 1
+  OPEN "E:\LOAD.PAL" FOR BINARY AS #3 LEN = 1
+  DIM DATO AS STRING * 1
+  DIM BASURA AS STRING * 128
+  DIM BUFFER AS STRING * 128
+  DIM CABECERA AS STRING * 10
+  GET #1, , BASURA'LEEMOS Y DESPRECIAMOS LA CABECERA
+  PUT #2, , CABECERA
+  FOR N = 1 TO (LOF(1) / 128) - 7 'LEEMOS LA ZONA COMPRIMIDA RLE
+    GET #1, , BUFFER
+    FOR J = 1 TO 128
+      DATO = MID$(BUFFER, J, 1)
+      IF TIPOBYTE = 1 THEN
+        FOR K = 1 TO NUMDATOS
+          PSET (X, Y), ASC(DATO)
+          X = X + 1
+          IF X > 319 THEN
+            Y = Y + 1
+            X = 0
+          END IF
+        NEXT K
+        TIPOBYTE = 0
+      ELSE
+        IF ASC(DATO) > 191 THEN
+          TIPOBYTE = 1
+          NUMDATOS = (ASC(DATO) - 192)
+        ELSE
+          PSET (X, Y), ASC(DATO)
+          X = X + 1
+          IF X > 319 THEN
+            Y = Y + 1
+            X = 0
+          END IF
+        END IF
+      END IF
+    NEXT J
+  NEXT N
+  DIM PALETA AS STRING * 768 'LEEMOS PALETA
+  GET #1, LOF(1) - 767, PALETA
+  K = 1
+  FOR N = 0 TO 255
+    CALL PONERPAL(N, ASC(MID$(PALETA, K, 1)) / 4, ASC(MID$(PALETA, K + 1, 1)) / 4, ASC(MID$(PALETA, K + 2, 1)) / 4)
+    K = K + 3
+  NEXT N
+  DO
+  LOOP UNTIL INKEY$ = CHR$(27)
+  CLOSE
+END SUB
+
+DEFSNG A-Z
+SUB PONERPAL (colorn AS INTEGER, r AS INTEGER, g AS INTEGER, b AS INTEGER)
+  OUT (&H3C8), colorn
+  OUT (&H3C9), r
+  OUT (&H3C9), g
+  OUT (&H3C9), b
+  'a$ = INPUT$(1)
+  'PRINT colorn; "="; r; ","; g; ","; b; "  "
+
+END SUB
+

@@ -1,0 +1,76 @@
+SCREEN 13
+CLS
+I = O
+D = 320
+A = 100: B = 100
+LINE (I, A)-(D, A), 1
+PAINT (0, A - 1), 33, 1
+PAINT (0, A + 1), 2, 1
+INTRODUCIR:
+
+M$ = INKEY$
+IF M$ = "6" THEN GOTO DERECHA
+IF M$ = "4" THEN GOTO IZQUIERDA
+IF M$ = "8" THEN GOTO ARRIBA
+IF M$ = "2" THEN GOTO ABAJO ELSE GOTO INTRODUCIR
+
+ARRIBA:
+A = A - 2
+B = B - 2
+IF A < 0 GOTO INTRODUCIR
+LINE (0, A + 2)-(320, B + 2), 2
+LINE (0, A)-(320, B), 1
+PAINT (0, B - 1), 33, 1
+PAINT (0, B + 1), 2, 1
+
+PAINT (0, A - 1), 33, 1
+PAINT (0, A + 1), 2, 1
+GOTO INTRODUCIR
+
+ABAJO:
+B = B + 2
+A = A + 2
+IF B > 198 THEN GOTO INTRODUCIR
+LINE (0, A - 2)-(320, B - 2), 33
+LINE (0, A)-(320, B), 1
+PAINT (0, A + 1), 2, 1
+PAINT (0, A - 1), 33, 1
+GOTO INTRODUCIR
+
+DERECHA:
+IF B < 0 THEN GOTO SEGIRBOL
+A = A + 2
+B = B - 2
+LINE (0, A - 2)-(320, B + 2), 2
+LINE (0, A - 2)-(320, B + 3), 2
+LINE (0, A - 2)-(320, B + 4), 2
+LINE (0, A - 2)-(320, B + 5), 2
+LINE (0, A - 2)-(320, B + 6), 2
+
+LINE (0, A)-(320, B), 1
+PAINT (0, A - 7), 33, 1
+PAINT (320, B + 7), 2, 1
+GOTO INTRODUCIR
+
+IZQUIERDA:
+IF A < 0 THEN GOTO INTRODUCIR
+A = A - 2
+B = B + 2
+LINE (0, A + 2)-(320, B - 2), 33
+LINE (0, A + 2)-(320, B - 3), 33
+LINE (0, A + 2)-(320, B - 4), 33
+LINE (0, A + 2)-(320, B - 5), 33
+
+LINE (0, A)-(320, B), 1
+PAINT (0, A + 1), 2, 1
+PAINT (320, B - 1), 33, 1
+GOTO INTRODUCIR
+SEGIRBOL:
+D = D - 2
+I = I + 2
+LINE (I, A)-(D, B), 1
+LINE (I - 1, A)-(D + 1, B), 2
+PAINT (0, 0), 33, 1
+
+GOTO INTRODUCIR
+

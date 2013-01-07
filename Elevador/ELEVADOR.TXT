@@ -1,0 +1,90 @@
+Comenzado: 29 Abril 2002.
+Autor: Jairo Alejandro Duarte Avenda¤o.
+
+
+PROGRAMA SIMULADOR DE UN ELEVADOR
+
+Una compa¤ia constructora de elevadores necesita un programa simulador que demuestre la
+eficacia de sus productos para lograr "atrapar" m s clientes. El programa debe modelar la
+operaci¢n de un elevador con una capacidad de cualquier n£mero de personas, en un edificio
+con cualquier n£mero de pisos, y determinar si dicho elevador cumple las necesidades
+requeridas por sus clientes.
+
+El elevador est  dise¤ado para conservar energ¡a por lo que solo se mueve cuando es
+necesario. El elevador comienza el d¡a esperando con la puerta cerrada en el primer piso
+del edificio. El simulador programa al azar la llegada de personas a los diferentes pisos
+seg£n una frecuencia especificada por el usuario. Cuando una persona llega al elevador,
+oprime el bot¢n del piso para llamar al elevador. El elevador indica su llegada a un piso
+encendiendo una luz encima de la puerta de dicho piso y haciendo sonar una campanilla en
+su interior. El bot¢n del piso y el bot¢n dentro del elevador correspondiente a tal piso se
+reestablecen, la puerta se abre, los pasajeros cuyo destino era ese piso salen, y si hay
+pasajeros esperando en ese piso, entran (siempre y cuando no superen la capacidad m xima
+del elevador) y oprimen los botones correspondientes a los pisos de destino de cada uno, el
+elevador cierra la puerta y determina el piso al que debe ir seg£n el orden en que fueron
+introducidos los destinos, pero parando en los pisos intermedios que hayan sido programados
+por otros pasajeros. El elevador siempre sabe en qu‚ piso est  y a qu‚ piso debe ir. La
+velocidad del elevador es determinada por el usuario, qui‚n tambi‚n debe tener la
+posibilidad de especificar el n£mero de pisos, la distancia entre los pisos y la tasa de
+llegada de pasajeros al elevador en los pisos del edificio.
+
+La meta es implementar un programa simulador funcional que opere de acuerdo con estas
+especificaciones. El programa deber  simlar varios minutos de la operaci¢n del elevador en
+tiempo real y determinar si tuvo ‚xito con los requerimientos de tr fico pronosticados
+para el edificio y con las especificaciones dadas al elevador.
+
+
+
+IDENTIFICACIàN Y CARACTERÖSTICAS DE LOS OBJETOS DEL SIMULADOR
+
+Elevador: Sube y baja, abre y cierra la puerta, recoje y deja pasajeros, hace sonar la
+          campana cuando llega a un destino
+Persona: Camina hasta el elevador, presiona botones del elevador, sube y abandona el
+         elevador, espera el elevador
+Piso: Determina que pasajeros que est n esperando al elevador, determina la hora a la que
+      llegar  la siguiente persona a esperar el elevador
+Bot¢n: Determina los pisos de destino
+Luz: Determina si un piso es destino del elevador
+Campana: Se¤ala la llegada del elevador a un piso
+Reloj: Controla el tiempo que tarda el elevador
+Edificio: Contiene a todo el sistema
+
+Bot¢n: Piso al que pertenece, estado (encendido / apagado)
+Luz: Piso al que pertenece
+Campana: Estado (si se activa o no)
+Reloj: Hora actual
+Piso: Personas que est n esperando, luz indicadora, hora a la que llegar  la siguiente
+      persona a esperar el elevador
+Persona: Piso en el que se encuentra, destino
+Elevador: Velocidad, piso en el que se encuentra, destino, pasajeros
+Edificio: N£mero de pisos, distancia entre pisos
+
+
+
+
+Bucle {
+
+        generar personas en el edificio aleatoriamente
+
+
+        por cada persona generada:
+
+            (si actitud == esperando -> no se hace nada)
+
+            si actitud == caminando camine
+
+            si no, si actitud == lleg¢ hasta elevador -> oprimaBoton, actitud = esperando
+
+            si no, si actitud == lleg¢ por usted el elevador -> entre
+
+            si no, si actitud == lleg¢ al piso deseado -> salga
+
+
+
+    Para el elevador:
+
+        si hay alg£n destino decida la direccion
+        muevase
+        si lleg¢ anuncie la llegada
+
+
+}

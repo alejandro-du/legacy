@@ -1,0 +1,22 @@
+SCREEN 13
+
+2 X = 6: Y = 20
+GOTO 1
+CUADRO:
+LINE (X, Y)-(X + 44, Y + 30), , B
+LINE (X, Y)-(X + 44, Y + 30)
+PAINT (X + 4, Y + 2), 15, 15
+PAINT (X + 2, Y + 10), 15, 15
+RETURN
+CLS
+1
+GOSUB CUADRO
+X = X + 1
+GOSUB CUADRO
+FOR z = 1 TO 600: NEXT z
+X = X - 1
+LINE (X, Y)-(X, Y + 44), O
+X = X + 1
+IF X > 350 GOTO 2
+GOTO 1
+

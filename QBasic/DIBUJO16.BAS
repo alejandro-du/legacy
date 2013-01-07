@@ -1,0 +1,18 @@
+SCREEN 13:  'Adaptador VGA
+X = 0
+C = 20
+FOR B = 1 TO 9
+FOR A = X TO X + 11
+FOR D = 1 TO 100: NEXT D
+LINE (0, A)-(319, A), C
+C = C + 1
+NEXT A
+FOR A = X + 11 TO X + 22
+FOR D = 1 TO 100: NEXT D
+C = C - 1
+LINE (0, A)-(319, A), C
+NEXT A
+X = X + 22
+NEXT B
+SLEEP
+

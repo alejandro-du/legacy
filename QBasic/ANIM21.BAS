@@ -1,0 +1,93 @@
+RANDOMIZE TIMER
+DIM AU(500), OB(50)
+GOSUB RAND
+SCREEN 9
+LINE (96, 100)-(132, 106), 4, BF
+LINE (110, 106)-(118, 118), 4, BF
+LINE (105, 112)-(123, 133), 4, BF
+LINE (109, 133)-(119, 137), 4, BF
+LINE (99, 137)-(129, 144), 4, BF
+LINE (110, 106)-(105, 112), 4: PAINT (109, 110), 4
+LINE (118, 108)-(123, 112), 4: PAINT (120, 111), 4
+LINE (111, 119)-(117, 127), 7, BF
+LINE (93, 110)-(98, 117), 8, BF
+LINE (131, 110)-(136, 117), 8, BF
+LINE (132, 127)-(141, 135), 8, BF
+LINE (87, 127)-(96, 135), 8, BF
+LINE (98, 111)-(104, 117), 8
+LINE (98, 117)-(104, 111), 8
+LINE (98, 114)-(104, 114), 8
+LINE (123, 111)-(130, 117), 8
+LINE (123, 117)-(130, 111), 8
+LINE (123, 114)-(132, 114), 8
+LINE (98, 128)-(104, 134), 8
+B$ = INKEY$
+LINE (98, 134)-(104, 128), 8
+LINE (98, 131)-(104, 131), 8
+LINE (124, 128)-(131, 134), 8
+LINE (124, 134)-(131, 128), 8
+LINE (124, 131)-(133, 131), 8
+GET (87, 100)-(141, 144), AU
+PUT (87, 100), AU
+LINE (100, 100)-(120, 110), 2, BF
+GET (100, 100)-(120, 110), OB
+PUT (100, 100), OB
+cor = 70
+PUT (70, 200), AU
+B$ = INKEY$
+CORD = -1
+1 A$ = INKEY$
+LOCATE 1, 50: PRINT "co="; CO; "  cor="; cor; "  CORD="; CORD; " "
+
+E = INT(RND * 10) + 1
+IF E = 2 OR W = 1 THEN
+CORD = CORD + INT(RND * 10) + 1
+IF CORD >= 300 THEN W = 0: CORD = 0: Q = 0
+PUT (CO, CORD), OB
+FOR A = 1 TO 10: NEXT A
+PUT (CO, CORD), OB
+W = 1
+IF CORD >= 190 AND cor < 244 THEN
+IF CO >= cor - 10 AND CO <= cor + 54 THEN GOTO ESTRELLAS
+END IF
+END IF
+IF A$ = "P" OR A$ = "p" THEN
+
+LOCATE 1, 50: PRINT "co="; CO; "  cor="; cor; "  CORD="; CORD; " "
+
+B$ = INKEY$
+PUT (cor, 200), AU
+cor = cor + 5
+IF cor >= 300 THEN cor = 295
+B$ = INKEY$
+PUT (cor, 200), AU
+END IF
+IF A$ = "O" OR A$ = "o" THEN
+IF Q = 0 THEN GOSUB RAND
+LOCATE 1, 50: PRINT "co="; CO; "  cor="; cor; "  CORD="; CORD; " "
+
+B$ = INKEY$
+PUT (cor, 200), AU
+cor = cor - 5
+IF cor <= 55 THEN cor = 60
+B$ = INKEY$
+PUT (cor, 200), AU
+END IF
+LINE (50, 0)-(60, 349), 4, BF
+B$ = INKEY$
+LINE (350, 0)-(360, 349), 4, BF
+FOR A = B TO 639 STEP 20
+LINE (50, A)-(60, A), 15
+LINE (350, A)-(360, A), 15
+NEXT A
+B = B + 10
+IF B > 20 THEN B = 1
+GOTO 1
+RAND:
+CO = INT(RND * 270) + 60
+Q = 1
+RETURN
+ESTRELLAS:
+BEEP
+END
+
