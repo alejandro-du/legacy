@@ -1,0 +1,40 @@
+ ----------------------------------------------------------------------------
+                            LIB13H V. 1.0
+                               Freeware
+                          DPA Software. 1999.
+                Autor: Jairo Alejandro Duarte Avenda¤o.
+                           jaal81@yahoo.com
+ ----------------------------------------------------------------------------
+
+
+Esta librer¡a est  dise¤ada para trabajar conjuntamente con los archivos de
+GAMES FACTORY PACK (Sprite Maker y Map Maker) para crear juegos (con o sin
+scroll). Puede hacer un programa con mucha funcionalidad escribiendo muy
+pocas l¡neas de c¢digo (vea los ejemplos incluidos). Es ideal para aprender
+los conceptos b sicos de la programaci¢n gr fica y de la programaci¢n de
+juegos en lenguaje C. Si usted est  comenzando con la programaci¢n de juegos,
+este paquete es el que necesita, ya que proporciona los elementos b sicos
+necesarios para crear un juego.
+
+Est  escrita en Borland C, y se incluye todo el c¢digo fuente. Solo soporta
+el modo 320*200*256. Puede utilizar archivos .MAP (de Map Maker 3.0), .SPR
+(de Sprite Maker 3.5), .PAL y .SPE (sprites enlazados con SPRLINK).
+
+Las rutinas gr ficas se encuentran en el archivo GRAFICOS.H, puede empezar
+por leer los prototipos para tener una idea de la funcionalidad de la
+librer¡a. El archivo MOUSE.H contiene las funciones para administrar el
+mouse. DPALIB.H declara las constantes y estructuras que utiliza la librer¡a.
+
+La utilidad SPRLINK.EXE (incluida con la libreria) ayuda a crear archivos
+.SPE. Un solo archivo SPE contiene un conjunto de sprites que forman una
+animaci¢n.
+
+
+   ***********************************************************
+   *                                                         *
+   *    SI DESEA OBTENER MAS INFORMACION O DOCUMENTACION     *
+   *    ACERCA DE LIBREARIA, PUEDE ESCRIBIRME A:             *
+   *                                                         *
+   *                 jaal81@yahoo.com                        *
+   *                                                         *
+   ***********************************************************

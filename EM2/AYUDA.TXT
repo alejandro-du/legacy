@@ -1,0 +1,329 @@
+ ----------------------------------------------------------------------------
+                        EDITOR DE MAPAS V. 2.0
+                               Freeware
+                          DPA Software. 1999.
+                Autor: Jairo Alejandro Duarte Avenda¤o.
+                           jaal81@yahoo.com
+ ----------------------------------------------------------------------------
+
+
+MAPAS DE BLOQUES
+
+Este programa le permitir  dise¤ar mapas de bloques (tile map) para sus
+juegos o aplicaciones multimedia.
+
+¨Qu‚ es un mapa de bloques?
+Es una matriz bidimensional que contiene en cada elemento la "descripci¢n"
+de una peque¤a parte de un gran mapa. En un juego, por ejemplo uno de vista
+cenital (desde encima), el mapa podr¡a ser el siguiente:
+
+               0 0 0 0 0 0 0 0 0 0 0 0 0
+               0 0 1 1 1 1 1 1 1 1 0 0 0
+               0 0 1 0 0 0 0 0 0 1 0 0 0
+               0 0 1 0 0 0 0 0 0 1 0 0 0
+               0 0 1 0 0 0 0 0 0 1 0 0 0
+               0 0 1 0 0 0 0 0 0 1 0 0 0
+               0 0 1 1 1 2 1 1 1 1 0 0 0
+               0 0 0 0 0 0 0 0 0 0 0 0 0
+
+el cual describe una habitaci¢n o un recinto cerrado, en esta matriz los
+"0" son el suelo, los "1" son paredes y el "2" es una puerta. Ahora, si
+implementamos un algoritmo que lea esta matriz e interprete cada elemento,
+para luego pintar imagenes en vez de ceros y unos, lo que se lograr¡a es
+dibujar un mapa convincente. Lo que se hace es ir tomando cada elemento de
+la matriz y, seg£n su valor, pintar determinada imagen (bloque). En el
+ejemplo anterior al leer un "0" se dibuja un bitmap que contiene la imagen
+de un trozo de suelo, al leer un "1" se dibuja un pedazo de pared y al leer
+un "2" se dibuja una puerta.
+
+
+GUIA DE USUARIO
+
+          F2           Guardar mapa
+          F4           Guardar mapa como...
+          CONTROL + B  Guardar el archivo BLK
+          F5           Abrir BLK
+          F6           Abrir MAP
+          F7           Abrir PAL
+          F8           Abrir BLK MAP PAL
+          F11          Ver rejilla
+          F12          Repintar pantalla
+          ESPACIO      Ver/ocultar mapa de bloques
+          TAB          Ver/ocultar barra de estado en pantalla completa
+          CONTROL + R  Re-abrir el archivo MAP
+          CONTROL + L  Llenar la pantalla con el bloque seleccionado
+          CONTROL + I  Ir a una posici¢n exacta del mapa
+          CONTROL + D  Ajustar las dimenciones del mapa
+          CONTROL + P  Ajustar el tama¤o de presentaci¢n del mapa
+          ESC          Salir del programa
+          ENTER        Pintar el bloque seleccionado en el mapa
+          RSHIFT       Seleccionar bloque
+          FLECHAS      Scroll de pantalla
+          LSHIFT  +    mouse, scroll de bloque)
+          CONTROL +    boton izquierdo del mouse, cambiar bloque
+          CONTROL + S  Cambiar la cadena de identificaci¢n
+          CONTROL + E  Informaci¢n y especificaciones
+          CONTROL + C  Establecer el color de la barra de estado
+          CONTROL + G  Cambiar el color de la rejilla
+          ALT          + bit, propiedad del bloque seleccionado
+
+
+FORMATO DE ARCHIVOS
+
+Este programa almacena las im genes de cada bloque en formato bitmap en un
+archivo con extenci¢n .BLK, y los mapas en archivos .MAP, en el que se guarda
+la matriz del mapa.
+
+Estructura de archivos BLK
+   6  bytes: Cabecera con la cadena "DPABLK".
+   1  byte:  Versi¢n de formato (1).
+   16 bytes: Cadena de identificaci¢n del archivo.
+   2  bytes: Valor entero con el n£mero total de bloques.
+   2  bytes: Valor entero con la medida del ancho de los bloques en pixeles.
+   2  bytes: Valor entero con la medida del alto de los bloques en pixeles.
+   x  bytes: Bitmaps de cada bloque. Cada byte representa el valor del color
+             de un pixel de determinado bloque. Para un archivo con 100
+             bloques de 32*32, se tendr¡a un total de 32*32*100 bytes. Se
+             debe leer por lineas horizontales de pixeles. Despu‚s de la
+             lectura de cada bloque, leer un byte de atributo.
+
+Estructura de archivos MAP
+   6  bytes: Cabecera con la cadena "DPAMAP".
+   1  byte:  Versi¢n de formato (1).
+   16 bytes: Cadena de identificaci¢n del archivo.
+   2  bytes: Valor entero con la medida del ancho del mapa en bloques.
+   2  bytes: Valor entero con la medida del alto del mapa en bloques.
+   x  DWORD: Array lineal con el mapa. Cada DWORD contiene el valor del
+             bloque en determinada posici¢n del mapa. Se debe leer por
+             lineas horizontales de bloques.
+
+
+A continuaci¢n incluyo las rutinas en C para cargar bloques y mapas que
+utilic‚ en el editor (con alguna modificaci¢n). Las rutinas utilizan las
+siguientes estructuras (fueron creadas con la librer¡a Allegro):
+
+typedef unsigned char BYTE;
+
+// estructura para el manejo de los mapas
+typedef struct MAPA_S {
+  int x, y; // posici¢n de inicio de dibujado del mapa
+  int ancho, alto; // tama¤o del mapa
+  int *mapa; // memoria usada para guardar el mapa
+  int bl_v, bl_h; // n£mero de bloques que se deben dibujar en pantalla
+  int bl_max; // n£mero de bloques usados
+  int bl_ancho, bl_alto; // tama¤o de cada bloque
+  unsigned char *blk_a; // atributos de cada bloque
+  BITMAP **blk; // array de punteros a bitmaps con los bloques
+} MAPA;
+
+
+// Carga el archivo BLK especificado en nombre_archivo y llena la
+// estructura a la que apunta mapa.
+int cargar_blk(char *nombre_archivo, MAPA *mapa, char *ids)
+{
+  FILE *archivo;
+  int num; // bloque actual
+  char dpablk[6], version;
+  BYTE x, y;
+
+  // abrir el archivo en modo binario
+  if((archivo = fopen(nombre_archivo, "rb")) == NULL)
+    return 1; // no se puede abrir el archivo
+
+  // leer cabecera BLK
+  if(fread(dpablk, 1, 6, archivo) != 6)
+    return 2;
+
+  DPABLK[6] = NULL;
+  ids[16] = NULL;
+
+  if(strcmp(DPABLK, "DPABLK") != 0)
+    return 3; // cabecera incorrecta
+  if(fread(&version, 1, 1, archivo) != 1) // versi¢n
+    return 4;
+  if(fread(ids, 16, 1, archivo) != 1) // ids
+    return 5;
+  if(fread(&mapa->bl_max, 2, 1, archivo) != 1) // n£mero de bloques
+    return 6;
+  if(fread(&mapa->bl_ancho, 2, 1, archivo) != 1) // ancho de bloque
+    return 7;
+  if(fread(&mapa->bl_alto, 2, 1, archivo) != 1) // alto de bloque
+    return 8;
+
+  // preparar memoria
+  if(mapa->blk != NULL)
+    cfree(mapa->blk);
+  if(mapa->blk_a != NULL)
+    free(mapa->blk_a);
+
+  mapa->blk = (BITMAP**)calloc(mapa->bl_max, sizeof(BITMAP));
+  mapa->blk_a = (unsigned char*)malloc(mapa->bl_max);
+  if(!mapa->blk)
+    return 9;
+
+  for(num = 0; num < mapa->bl_max; num++)
+    mapa->blk[num] = create_bitmap(mapa->bl_ancho, mapa->bl_alto);
+
+  // cargar los bloques
+  x = 0; y = 0;
+  for(num = 0; num < mapa->bl_max;) {
+    mapa->blk[num]->line[y][x] = getc(archivo); // leer byte
+    if(ferror(archivo))
+      return 10;
+    x++;
+    if(x >= mapa->bl_ancho) {
+      x = 0;
+      y++;
+    }
+    if(y >= mapa->bl_alto) {
+      num++;
+      y = 0;
+    }
+  }
+
+  for(num = 0; num < mapa->bl_max; num++) {
+    mapa->blk_a[num] = getc(archivo); // byte de atributo
+    if(ferror(archivo))
+      return 11;
+  }
+
+  fclose(archivo);
+  mapa->bl_h = 640 / mapa->bl_ancho;
+  mapa->bl_v = 480 / mapa->bl_alto;
+
+  return 0;
+}
+
+
+// Carga el archivo MAP especificado en nombre_archivo y llena la
+// estructura a la que apunta mapa.
+int cargar_map(char *nombre_archivo, MAPA *mapa, char *ids)
+{
+  FILE *archivo; // manejador del archivo
+  long int contador;
+  char dpamap[7], version;
+
+  // abrir el archivo
+  if((archivo = fopen(nombre_archivo, "rb")) == NULL)
+    return 1;
+
+  // leer la cabecera
+  if(fread(dpamap, 1, 6, archivo) != 6)
+    return 2;
+
+  dpamap[6] = NULL;
+  if(strcmp(dpamap, "DPAMAP") != 0)
+    return 3;
+  if(fread(&version, 1, 1, archivo) != 1) // versi¢n
+  ids[16] = NULL;
+  if(fread(ids, 16, 1, archivo) != 1) // ids
+    return 4;
+  if(fread(&mapa->ancho, 2, 1, archivo) != 1) // ancho
+    return 5;
+  if(fread(&mapa->alto, 2, 1, archivo) != 1) // alto del mapa
+    return 6;
+
+  //reservar la memoria necesaria
+  if(mapa->mapa != NULL)
+    free(mapa->mapa);
+  mapa->mapa = (int*)malloc((mapa->ancho)*(mapa->alto)*sizeof(int));
+
+  if(!mapa->mapa)
+    return 7;
+
+  // cargar el mapa
+  for(contador = 0; contador < (mapa->ancho * mapa->alto); contador++) {
+    // leer de a cuatro bytes (int 32 bits)
+    if(fread(&mapa->mapa[contador], 4, 1, archivo) != 1)
+      return 8;
+    if(mapa->mapa[contador] > (mapa->bl_max))
+      return 9;
+  }
+  fclose(archivo);
+  mapa->x = 0;
+  mapa->y = 0;
+  modificado = ' ';
+
+  return 0;
+}
+
+
+
+int cargar_pal(nombre_archivo)
+{
+  FILE *archivo;
+  int contador;
+  PALLETE paleta;
+
+  if((archivo = fopen(nombre_archivo, "rb")) == NULL)
+    return 1;
+
+  for(contador = 0; contador < 256; contador++) {
+    paleta[contador].r = getc(archivo);
+    paleta[contador].g = getc(archivo);
+    paleta[contador].b = getc(archivo);
+    if(ferror(archivo))
+      return 2;
+  }
+
+  set_pallete((RGB*)paleta);
+
+  return 0;
+}
+
+
+void pintar_mapa(BITMAP *buffer, MAPA *mapa)
+{
+  int x, y, num = 0;
+
+  num += mapa->alto * mapa->x + mapa->y; // avanzar a la posicion actual
+
+  // pintar el mapa
+  for(x = 0; x < mapa->bl_h; x++) {
+    for(y = 0; y < mapa->bl_v; y++) {
+      blit(mapa->blk[mapa->mapa[num]],
+           buffer, 0, 0, (x * mapa->bl_ancho),
+           (y * mapa->bl_alto),
+           mapa->bl_ancho,
+           mapa->bl_alto);
+
+      num++;
+    }
+    num += mapa->alto - mapa->bl_v;
+  }
+}
+
+
+UTILIDADES ADICIONALES
+
+BB.EXE
+Este programa convierte archivos BMP, PCX, LBM, TGA a archivos BLK. As¡ usted
+podr  crear sus bloques en cualquier editor gr fico disponible, para luego
+utilizarlos con el Editor de Mapas. Ej. de uso:
+
+   BB imagen.bmp bloques.blk
+
+Lo anterior convierte el bitmap imagen.bmp a uno bloques.blk, el programa
+solicita lo siguiente:
+
+  Ancho de bloque.
+  Alto de bloque.
+  N£mero de bloques horizontales.
+  N£mero de bloques verticales.
+  Cadena identificadora para el blk.
+
+Lo que hace es cortar la imagen original en rectangulos del tama¤o
+especificado en ancho y alto de bloque.
+
+
+BLKC.EXE
+Es un convertidor de archivos .BLK de Map Maker 3.0 a .BLK utilizado por
+el Editor de Mapas.
+
+
+----------------------------------------------------------------------------
+     Si tiene alg£n comentario, duda o sugerencia puede escribirme a:
+
+                          jaal81@yahoo.com
+
+----------------------------------------------------------------------------
